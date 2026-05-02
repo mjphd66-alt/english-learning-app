@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { UserData } from '@/app/lib/types'
 
 interface WelcomeBannerProps {
@@ -7,14 +8,9 @@ interface WelcomeBannerProps {
 }
 
 export function WelcomeBanner({ userData }: WelcomeBannerProps) {
-  const getTimeGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12) return '早上好'
-    if (hour < 18) return '下午好'
-    return '晚上好'
-  }
+  const [challenge, setChallenge] = useState('英语可以这样学，轻松又有趣！')
 
-  const getTodayChallenge = () => {
+  useEffect(() => {
     const challenges = [
       '今天学一个新单词吧！',
       '你可以学多个分类呢！',
@@ -22,8 +18,14 @@ export function WelcomeBanner({ userData }: WelcomeBannerProps) {
       '英语可以这样学，轻松又有趣！',
       '每天进步一点点，就是最大的成功！'
     ]
-    const index = Math.floor(Math.random() * challenges.length)
-    return challenges[index]
+    setChallenge(challenges[Math.floor(Math.random() * challenges.length)])
+  }, [])
+
+  const getTimeGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour < 12) return '早上好'
+    if (hour < 18) return '下午好'
+    return '晚上好'
   }
 
   return (
@@ -44,7 +46,7 @@ export function WelcomeBanner({ userData }: WelcomeBannerProps) {
           )}
         </p>
         <p className="text-sm opacity-90">
-          {getTodayChallenge()}
+          {challenge}
         </p>
         {userData && (
           <p className="text-xs opacity-75 mt-2">
