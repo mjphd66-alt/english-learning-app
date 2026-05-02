@@ -1,0 +1,266 @@
+import { LearningCategory, Achievement, UserData } from './types'
+
+export const learningCategories: LearningCategory[] = [
+  {
+    id: 'animals',
+    icon: '🦁',
+    title: '动物篇',
+    description: '学习44种动物的英文名称和科普知识',
+    color: '#FF6B6B',
+    type: 'vocab',
+    items: [
+      { id: 'a01', title: '猫', englishTitle: 'Cat', image: '🐱', pronunciation: '/kæt/', audio: '/audio/animals/【01-Cat全文】.mp3' },
+      { id: 'a02', title: '狗', englishTitle: 'Dog', image: '🐶', pronunciation: '/dɔːɡ/', audio: '/audio/animals/【02-Dog全文】.mp3' },
+      { id: 'a03', title: '长颈鹿', englishTitle: 'Giraffe', image: '🦒', pronunciation: '/dʒɪˈræf/', audio: '/audio/animals/【03-giraffe全文】.mp3' },
+      { id: 'a04', title: '鲨鱼', englishTitle: 'Shark', image: '🦈', pronunciation: '/ʃɑːrk/', audio: '/audio/animals/【04-Shark全文】.mp3' },
+      { id: 'a05', title: '青蛙', englishTitle: 'Frog', image: '🐸', pronunciation: '/frɒɡ/', audio: '/audio/animals/【05-frog1全文】.mp3' },
+      { id: 'a06', title: '火烈鸟', englishTitle: 'Flamingo', image: '🦩', pronunciation: '/fləˈmɪŋɡoʊ/', audio: '/audio/animals/【06-flamingo全文】.mp3' },
+      { id: 'a07', title: '鸡', englishTitle: 'Chicken', image: '🐔', pronunciation: '/ˈtʃɪkɪn/', audio: '/audio/animals/【07-Chicken全文】.mp3' },
+      { id: 'a08', title: '鸵鸟', englishTitle: 'Ostrich', image: '🦤', pronunciation: '/ˈɒstrɪtʃ/', audio: '/audio/animals/【08-Ostrich全文】.mp3' },
+      { id: 'a09', title: '鸭子', englishTitle: 'Duck', image: '🦆', pronunciation: '/dʌk/', audio: '/audio/animals/【09-duck全文】.mp3' },
+      { id: 'a10', title: '小鸡', englishTitle: 'Chick', image: '🐥', pronunciation: '/tʃɪk/', audio: '/audio/animals/【10-chick全文】.mp3' },
+      { id: 'a11', title: '河马', englishTitle: 'Hippo', image: '🦛', pronunciation: '/ˈhɪpoʊ/', audio: '/audio/animals/【11-hippo全文】.mp3' },
+      { id: 'a12', title: '大象', englishTitle: 'Elephant', image: '🐘', pronunciation: '/ˈɛlɪfənt/', audio: '/audio/animals/【12-elephant全文】.mp3' },
+      { id: 'a13', title: '鲸鱼', englishTitle: 'Whale', image: '🐋', pronunciation: '/weɪl/', audio: '/audio/animals/【13-whale全文】.mp3' },
+      { id: 'a14', title: '犀牛', englishTitle: 'Rhino', image: '🦏', pronunciation: '/ˈraɪnoʊ/', audio: '/audio/animals/【14-rhino全文】.mp3' },
+      { id: 'a15', title: '牛', englishTitle: 'Cow', image: '🐄', pronunciation: '/kaʊ/', audio: '/audio/animals/【15-cow全文】.mp3' },
+      { id: 'a16', title: '兔子', englishTitle: 'Rabbit', image: '🐰', pronunciation: '/ˈræbɪt/', audio: '/audio/animals/【16-rabbit全文】.mp3' },
+      { id: 'a17', title: '马', englishTitle: 'Horse', image: '🐴', pronunciation: '/hɔːrs/', audio: '/audio/animals/【17-horse全文】.mp3' },
+      { id: 'a18', title: '鹅', englishTitle: 'Goose', image: '🪿', pronunciation: '/ɡuːs/', audio: '/audio/animals/【18-goose全文】.mp3' },
+      { id: 'a19', title: '章鱼', englishTitle: 'Octopus', image: '🐙', pronunciation: '/ˈɒktəpəs/', audio: '/audio/animals/【19-octopus全文】.mp3' },
+      { id: 'a20', title: '蚊子', englishTitle: 'Mosquito', image: '🦟', pronunciation: '/məˈskiːtoʊ/', audio: '/audio/animals/【20-mosquito全文】.mp3' },
+      { id: 'a21', title: '熊猫', englishTitle: 'Panda', image: '🐼', pronunciation: '/ˈpændə/', audio: '/audio/animals/【21-Panda全文】.mp3' },
+      { id: 'a22', title: '北极熊', englishTitle: 'Polar Bear', image: '🐻‍❄️', pronunciation: '/ˈpoʊlər ber/', audio: '/audio/animals/【22-polar bear】.mp3' },
+      { id: 'a23', title: '企鹅', englishTitle: 'Penguin', image: '🐧', pronunciation: '/ˈpɛŋɡwɪn/', audio: '/audio/animals/【23-penguin全文】.mp3' },
+      { id: 'a24', title: '猪', englishTitle: 'Pig', image: '🐷', pronunciation: '/pɪɡ/', audio: '/audio/animals/【24-pig全文】.mp3' },
+      { id: 'a26', title: '老虎', englishTitle: 'Tiger', image: '🐯', pronunciation: '/ˈtaɪɡər/', audio: '/audio/animals/【26-tiger全文】.mp3' },
+      { id: 'a27', title: '狮子', englishTitle: 'Lion', image: '🦁', pronunciation: '/ˈlaɪən/', audio: '/audio/animals/【27-狮子全文】.mp3' },
+      { id: 'a28', title: '豹子', englishTitle: 'Leopard', image: '🐆', pronunciation: '/ˈlɛpərd/', audio: '/audio/animals/【28-豹子全文】.mp3' },
+      { id: 'a30', title: '袋鼠', englishTitle: 'Kangaroo', image: '🦘', pronunciation: '/ˌkæŋɡəˈruː/', audio: '/audio/animals/【30-袋鼠全文】.mp3' },
+      { id: 'a32', title: '蝴蝶', englishTitle: 'Butterfly', image: '🦋', pronunciation: '/ˈbʌtərflaɪ/', audio: '/audio/animals/【32-蝴蝶全文】.mp3' },
+      { id: 'a33', title: '猴子', englishTitle: 'Monkey', image: '🐵', pronunciation: '/ˈmʌŋki/', audio: '/audio/animals/【33-猴子全文】.mp3' },
+      { id: 'a34', title: '海龟', englishTitle: 'Sea Turtle', image: '🐢', pronunciation: '/siː ˈtɜːrtl/', audio: '/audio/animals/【34-海龟全文】.mp3' },
+      { id: 'a36', title: '狼', englishTitle: 'Wolf', image: '🐺', pronunciation: '/wʊlf/', audio: '/audio/animals/【36-狼全文】.mp3' },
+      { id: 'a37', title: '斑马', englishTitle: 'Zebra', image: '🦓', pronunciation: '/ˈziːbrə/', audio: '/audio/animals/【37-斑马全文】.mp3' },
+      { id: 'a38', title: '猫头鹰', englishTitle: 'Owl', image: '🦉', pronunciation: '/aʊl/', audio: '/audio/animals/【38-猫头鹰全文】.mp3' },
+      { id: 'a43', title: '考拉', englishTitle: 'Koala', image: '🐨', pronunciation: '/koʊˈɑːlə/', audio: '/audio/animals/【43-考拉全文】.mp3' },
+    ]
+  },
+  {
+    id: 'fruits',
+    icon: '🍎',
+    title: '果蔬篇',
+    description: '学习36种水果蔬菜的英文名称和科普知识',
+    color: '#4ECDC4',
+    type: 'vocab',
+    items: [
+      { id: 'f01', title: '香蕉', englishTitle: 'Banana', image: '🍌', pronunciation: '/bəˈnænə/', audio: '/audio/fruits/【01-Banana全文】.mp3' },
+      { id: 'f02', title: '西瓜', englishTitle: 'Watermelon', image: '🍉', pronunciation: '/ˈwɔːtərmelən/', audio: '/audio/fruits/【02-watermelon全文】.mp3' },
+      { id: 'f03', title: '草莓', englishTitle: 'Strawberry', image: '🍓', pronunciation: '/ˈstrɔːberi/', audio: '/audio/fruits/【03-strawberry全文】.mp3' },
+      { id: 'f04', title: '芒果', englishTitle: 'Mango', image: '🥭', pronunciation: '/ˈmæŋɡoʊ/', audio: '/audio/fruits/【04-mango全文】.mp3' },
+      { id: 'f05', title: '葡萄', englishTitle: 'Grape', image: '🍇', pronunciation: '/ɡreɪp/', audio: '/audio/fruits/【05-grape全文】.mp3' },
+      { id: 'f06', title: '柠檬', englishTitle: 'Lemon', image: '🍋', pronunciation: '/ˈlɛmən/', audio: '/audio/fruits/【6-lemon全文】.mp3' },
+      { id: 'f07', title: '苹果', englishTitle: 'Apple', image: '🍎', pronunciation: '/ˈæpl/', audio: '/audio/fruits/【07-Apple全文】.mp3' },
+      { id: 'f08', title: '蓝莓', englishTitle: 'Blueberry', image: '🫐', pronunciation: '/ˈbluːberi/', audio: '/audio/fruits/【08-blueberry全文】.mp3' },
+      { id: 'f09', title: '菠萝', englishTitle: 'Pineapple', image: '🍍', pronunciation: '/ˈpaɪnæpl/', audio: '/audio/fruits/【09-pineapple全文】.mp3' },
+      { id: 'f11', title: '樱桃', englishTitle: 'Cherry', image: '🍒', pronunciation: '/ˈtʃɛri/', audio: '/audio/fruits/【11-cherry全文】.mp3' },
+      { id: 'f12', title: '桃子', englishTitle: 'Peach', image: '🍑', pronunciation: '/piːtʃ/', audio: '/audio/fruits/【12-peach全文】.mp3' },
+      { id: 'f13', title: '橙子', englishTitle: 'Orange', image: '🍊', pronunciation: '/ˈɔːrɪndʒ/', audio: '/audio/fruits/【13-orange全文】.mp3' },
+      { id: 'f14', title: '梨', englishTitle: 'Pear', image: '🍐', pronunciation: '/per/', audio: '/audio/fruits/【14-pear全文】.mp3' },
+      { id: 'f16', title: '西兰花', englishTitle: 'Broccoli', image: '🥦', pronunciation: '/ˈbrɒkəli/', audio: '/audio/fruits/【16-broccoli全文】.mp3' },
+      { id: 'f17', title: '黄瓜', englishTitle: 'Cucumber', image: '🥒', pronunciation: '/ˈkjuːkʌmbər/', audio: '/audio/fruits/【17-cucumber全文】.mp3' },
+      { id: 'f18', title: '番茄', englishTitle: 'Tomato', image: '🍅', pronunciation: '/təˈmeɪtoʊ/', audio: '/audio/fruits/【18-tomato全文】.mp3' },
+      { id: 'f19', title: '土豆', englishTitle: 'Potato', image: '🥔', pronunciation: '/pəˈteɪtoʊ/', audio: '/audio/fruits/【19-potato全文】.mp3' },
+      { id: 'f23', title: '玉米', englishTitle: 'Corn', image: '🌽', pronunciation: '/kɔːrn/', audio: '/audio/fruits/【23-corn全文】.mp3' },
+    ]
+  },
+  {
+    id: 'vehicles',
+    icon: '🚗',
+    title: '车辆篇',
+    description: '学习20种车辆的英文名称和科普知识',
+    color: '#45B7D1',
+    type: 'vocab',
+    items: [
+      { id: 'v01', title: '消防车', englishTitle: 'Fire Truck', image: '🚒', pronunciation: '/faɪr trʌk/', audio: '/audio/vehicles/【1-消防车全文】.mp3' },
+      { id: 'v02', title: '救护车', englishTitle: 'Ambulance', image: '🚑', pronunciation: '/ˈæmbjələns/', audio: '/audio/vehicles/【2-救护车全文】.mp3' },
+      { id: 'v03', title: '警车', englishTitle: 'Police Car', image: '🚔', pronunciation: '/pəˈliːs kɑːr/', audio: '/audio/vehicles/【3-警车全文】.mp3' },
+      { id: 'v04', title: '挖掘机', englishTitle: 'Excavator', image: '🚜', pronunciation: '/ˈɛkskəveɪtər/', audio: '/audio/vehicles/【4-挖掘机全文】.mp3' },
+      { id: 'v14', title: '飞机', englishTitle: 'Airplane', image: '✈️', pronunciation: '/ˈɛrpleɪn/', audio: '/audio/vehicles/【14-飞机全文】.mp3' },
+      { id: 'v15', title: '高铁', englishTitle: 'High-speed Train', image: '🚄', pronunciation: '/haɪ spiːd treɪn/', audio: '/audio/vehicles/【15-高铁全文】.mp3' },
+      { id: 'v16', title: '公交车', englishTitle: 'Bus', image: '🚌', pronunciation: '/bʌs/', audio: '/audio/vehicles/【16-公交车全文】.mp3' },
+      { id: 'v17', title: '汽车', englishTitle: 'Car', image: '🚗', pronunciation: '/kɑːr/', audio: '/audio/vehicles/【17-汽车全文】.mp3' },
+      { id: 'v20', title: '直升机', englishTitle: 'Helicopter', image: '🚁', pronunciation: '/ˈhɛlɪkɒptər/', audio: '/audio/vehicles/【20-直升机全文】.mp3' },
+    ]
+  },
+  {
+    id: 'textbook',
+    icon: '📖',
+    title: '北京版二年级下册',
+    description: '课本课文朗读和歌曲，6个单元',
+    color: '#9B59B6',
+    type: 'textbook',
+    items: [
+      { id: 't1r', title: '第1单元 朗读', englishTitle: 'Unit 1 Read', image: '📖', audio: '/audio/textbook/第1单元 read.mp3' },
+      { id: 't1s', title: '第1单元 歌曲', englishTitle: 'Unit 1 Sing', image: '🎵', audio: '/audio/textbook/第1单元 sing.mp3' },
+      { id: 't2r', title: '第2单元 朗读', englishTitle: 'Unit 2 Read', image: '📖', audio: '/audio/textbook/第2单元 read.mp3' },
+      { id: 't2s', title: '第2单元 歌曲', englishTitle: 'Unit 2 Sing', image: '🎵', audio: '/audio/textbook/第2单元sing.mp3' },
+      { id: 't3r', title: '第3单元 朗读', englishTitle: 'Unit 3 Read', image: '📖', audio: '/audio/textbook/第3单元 read.mp3' },
+      { id: 't3s', title: '第3单元 歌曲', englishTitle: 'Unit 3 Sing', image: '🎵', audio: '/audio/textbook/第3单元sing.mp3' },
+      { id: 't4r', title: '第4单元 朗读', englishTitle: 'Unit 4 Read', image: '📖', audio: '/audio/textbook/第4单元 read.mp3' },
+      { id: 't4s', title: '第4单元 歌曲', englishTitle: 'Unit 4 Sing', image: '🎵', audio: '/audio/textbook/第4单元 sing.mp3' },
+      { id: 't5r', title: '第5单元 朗读', englishTitle: 'Unit 5 Read', image: '📖', audio: '/audio/textbook/第5单元 read.mp3' },
+      { id: 't5s', title: '第5单元 歌曲', englishTitle: 'Unit 5 Sing', image: '🎵', audio: '/audio/textbook/第5单元sing.mp3' },
+      { id: 't6r', title: '第6单元 朗读', englishTitle: 'Unit 6 Read', image: '📖', audio: '/audio/textbook/第6单元 read.mp3' },
+      { id: 't6s', title: '第6单元 歌曲', englishTitle: 'Unit 6 Sing', image: '🎵', audio: '/audio/textbook/第6单元 sing.mp3' },
+    ]
+  },
+  {
+    id: 'videos',
+    icon: '🎬',
+    title: '课文教学视频',
+    description: '北京版二年级下册教学动画视频',
+    color: '#E74C3C',
+    type: 'video',
+    items: [
+      { id: 'vp1', title: 'P1 课文视频', image: '🎬', video: '/video/P1.mp4' },
+      { id: 'vp2', title: 'P2 课文视频', image: '🎬', video: '/video/P2.mp4' },
+      { id: 'vp9', title: 'P9 课文视频', image: '🎬', video: '/video/P9.mp4' },
+      { id: 'vp10', title: 'P10 课文视频', image: '🎬', video: '/video/P10.mp4' },
+      { id: 'vp12', title: 'P12 课文视频', image: '🎬', video: '/video/P12.mp4' },
+      { id: 'vp17', title: 'P17 课文视频', image: '🎬', video: '/video/P17.mp4' },
+      { id: 'vp18', title: 'P18 课文视频', image: '🎬', video: '/video/P18.mp4' },
+      { id: 'vp20', title: 'P20 课文视频', image: '🎬', video: '/video/P20.mp4' },
+    ]
+  },
+  {
+    id: 'pdf-materials',
+    icon: '📄',
+    title: '学习资料',
+    description: '教材PDF、思维导图、亲子句子卡片',
+    color: '#F39C12',
+    type: 'pdf',
+    items: [
+      { id: 'pdf1', title: '北京版二年级英语下册教材', image: '📖', pdf: '/pdf/北京版二年级英语下册·新版教材.pdf', description: '完整课本教材' },
+      { id: 'pdf2', title: '英语科普类思维导图102张', image: '🧠', pdf: '/pdf/科普类思维导图102张.pdf', description: '动物、果蔬、车辆思维导图' },
+      { id: 'pdf3', title: '亲子英语句子卡片380个', image: '👨‍👩‍👧', pdf: '/pdf/亲子英语句子卡片（380个）.pdf', description: '日常亲子英语对话练习' },
+    ]
+  },
+  {
+    id: 'alphabet',
+    icon: '🔤',
+    title: '26个字母',
+    description: '学习英文字母和发音，点击就能听',
+    color: '#FF6B9D',
+    type: 'vocab',
+    items: [
+      { id: 'la', title: 'A', englishTitle: 'Apple', image: '🍎', pronunciation: '/eɪ/' },
+      { id: 'lb', title: 'B', englishTitle: 'Ball', image: '⚽', pronunciation: '/biː/' },
+      { id: 'lc', title: 'C', englishTitle: 'Cat', image: '🐱', pronunciation: '/siː/' },
+      { id: 'ld', title: 'D', englishTitle: 'Dog', image: '🐶', pronunciation: '/diː/' },
+      { id: 'le', title: 'E', englishTitle: 'Egg', image: '🥚', pronunciation: '/iː/' },
+      { id: 'lf', title: 'F', englishTitle: 'Fish', image: '🐠', pronunciation: '/ɛf/' },
+      { id: 'lg', title: 'G', englishTitle: 'Green', image: '💚', pronunciation: '/dʒiː/' },
+      { id: 'lh', title: 'H', englishTitle: 'House', image: '🏠', pronunciation: '/eɪtʃ/' },
+      { id: 'li', title: 'I', englishTitle: 'Ice Cream', image: '🍦', pronunciation: '/aɪ/' },
+      { id: 'lj', title: 'J', englishTitle: 'Jump', image: '🤸', pronunciation: '/dʒeɪ/' },
+      { id: 'lk', title: 'K', englishTitle: 'King', image: '👑', pronunciation: '/keɪ/' },
+      { id: 'll', title: 'L', englishTitle: 'Lion', image: '🦁', pronunciation: '/ɛl/' },
+      { id: 'lm', title: 'M', englishTitle: 'Monkey', image: '🐵', pronunciation: '/ɛm/' },
+      { id: 'ln', title: 'N', englishTitle: 'Nose', image: '👃', pronunciation: '/ɛn/' },
+      { id: 'lo', title: 'O', englishTitle: 'Orange', image: '🍊', pronunciation: '/oʊ/' },
+      { id: 'lp', title: 'P', englishTitle: 'Penguin', image: '🐧', pronunciation: '/piː/' },
+      { id: 'lq', title: 'Q', englishTitle: 'Queen', image: '👸', pronunciation: '/kjuː/' },
+      { id: 'lr', title: 'R', englishTitle: 'Rabbit', image: '🐰', pronunciation: '/ɑːr/' },
+      { id: 'ls', title: 'S', englishTitle: 'Sun', image: '☀️', pronunciation: '/ɛs/' },
+      { id: 'lt', title: 'T', englishTitle: 'Tiger', image: '🐯', pronunciation: '/tiː/' },
+      { id: 'lu', title: 'U', englishTitle: 'Umbrella', image: '☂️', pronunciation: '/juː/' },
+      { id: 'lv', title: 'V', englishTitle: 'Violin', image: '🎻', pronunciation: '/viː/' },
+      { id: 'lw', title: 'W', englishTitle: 'Water', image: '💧', pronunciation: '/ˈdʌbəljuː/' },
+      { id: 'lx', title: 'X', englishTitle: 'Xylophone', image: '🎵', pronunciation: '/ɛks/' },
+      { id: 'ly', title: 'Y', englishTitle: 'Yellow', image: '💛', pronunciation: '/waɪ/' },
+      { id: 'lz', title: 'Z', englishTitle: 'Zebra', image: '🦓', pronunciation: '/zɛd/' },
+    ]
+  },
+  {
+    id: 'greetings',
+    icon: '👋',
+    title: '日常用语',
+    description: '日常问候和简单对话，点击就能听发音',
+    color: '#FFD93D',
+    type: 'vocab',
+    items: [
+      { id: 'g01', title: '你好', englishTitle: 'Hello', image: '👋', pronunciation: '/həˈloʊ/' },
+      { id: 'g02', title: '早上好', englishTitle: 'Good Morning', image: '🌅', pronunciation: '/ɡʊd ˈmɔːrnɪŋ/' },
+      { id: 'g03', title: '下午好', englishTitle: 'Good Afternoon', image: '☀️', pronunciation: '/ɡʊd ˌæftərˈnuːn/' },
+      { id: 'g04', title: '晚上好', englishTitle: 'Good Evening', image: '🌆', pronunciation: '/ɡʊd ˈiːvnɪŋ/' },
+      { id: 'g05', title: '晚安', englishTitle: 'Good Night', image: '🌙', pronunciation: '/ɡʊd naɪt/' },
+      { id: 'g06', title: '谢谢', englishTitle: 'Thank You', image: '🙏', pronunciation: '/θæŋk juː/' },
+      { id: 'g07', title: '对不起', englishTitle: 'Sorry', image: '😞', pronunciation: '/ˈsɒri/' },
+      { id: 'g08', title: '再见', englishTitle: 'Goodbye', image: '👋', pronunciation: '/ɡʊdˈbaɪ/' },
+      { id: 'g09', title: '请', englishTitle: 'Please', image: '🤝', pronunciation: '/pliːz/' },
+      { id: 'g10', title: '没关系', englishTitle: "You're Welcome", image: '😊', pronunciation: '/jʊər ˈwɛlkəm/' },
+    ]
+  },
+]
+
+export const achievements: Achievement[] = [
+  {
+    id: 'first-checkin', name: '初出茅庐', description: '完成第一次打卡', icon: '🎯', level: 1,
+    condition: (d: UserData) => d.totalCheckIns >= 1
+  },
+  {
+    id: 'streak-3', name: '小有成就', description: '连续打卡3天', icon: '🔥', level: 1,
+    condition: (d: UserData) => d.currentStreak >= 3
+  },
+  {
+    id: 'streak-7', name: '坚持一周', description: '连续打卡7天', icon: '🔥🔥', level: 2,
+    condition: (d: UserData) => d.currentStreak >= 7
+  },
+  {
+    id: 'streak-30', name: '月度冠军', description: '连续打卡30天', icon: '⭐', level: 3,
+    condition: (d: UserData) => d.currentStreak >= 30
+  },
+  {
+    id: 'streak-100', name: '百日坚持', description: '连续打卡100天', icon: '🏆', level: 3,
+    condition: (d: UserData) => d.currentStreak >= 100
+  },
+  {
+    id: 'study-1hour', name: '初尝学习', description: '累计学习1小时', icon: '📚', level: 1,
+    condition: (d: UserData) => d.totalLearningMinutes >= 60
+  },
+  {
+    id: 'study-5hours', name: '学习使者', description: '累计学习5小时', icon: '📚📚', level: 2,
+    condition: (d: UserData) => d.totalLearningMinutes >= 300
+  },
+  {
+    id: 'study-20hours', name: '学习达人', description: '累计学习20小时', icon: '📚📚📚', level: 2,
+    condition: (d: UserData) => d.totalLearningMinutes >= 1200
+  },
+  {
+    id: 'category-3', name: '多面手', description: '学习3个不同分类', icon: '🎯', level: 1,
+    condition: (d: UserData) => d.visitedCategories.size >= 3
+  },
+  {
+    id: 'category-5', name: '全科学者', description: '学习5个不同分类', icon: '🌟', level: 2,
+    condition: (d: UserData) => d.visitedCategories.size >= 5
+  },
+  {
+    id: 'category-all', name: '全能博士', description: '学习所有分类', icon: '🎓', level: 3,
+    condition: (d: UserData) => d.visitedCategories.size >= 7
+  },
+  {
+    id: 'checkin-10', name: '十次打卡', description: '累计打卡10次', icon: '✅', level: 1,
+    condition: (d: UserData) => d.totalCheckIns >= 10
+  },
+  {
+    id: 'checkin-50', name: '五十次打卡', description: '累计打卡50次', icon: '✅✅', level: 2,
+    condition: (d: UserData) => d.totalCheckIns >= 50
+  },
+  {
+    id: 'checkin-100', name: '百次打卡', description: '累计打卡100次', icon: '✅✅✅', level: 3,
+    condition: (d: UserData) => d.totalCheckIns >= 100
+  },
+]
+
+export const STORAGE_KEY = 'english-learning-app-data'
