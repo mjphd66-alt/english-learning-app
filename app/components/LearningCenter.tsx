@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { learningCategories } from '@/app/lib/data'
 import { addCategoryVisit } from '@/app/lib/storage'
 
@@ -11,6 +11,16 @@ function speak(text: string, lang = 'en-US') {
   u.lang = lang
   u.rate = 0.8
   window.speechSynthesis.speak(u)
+}
+
+let currentAudio: HTMLAudioElement | null = null
+
+function stopCurrentAudio() {
+  if (currentAudio) {
+    currentAudio.pause()
+    currentAudio.currentTime = 0
+    currentAudio = null
+  }
 }
 
 export function LearningCenter() {
@@ -29,21 +39,29 @@ export function LearningCenter() {
 
   const playAudio = (src: string) => {
     try {
-      setPlayingAudio(src)
+      stopCurrentAudio()
+      window.speechSynthesis?.cancel()
       const a = new Audio(src)
-      a.onended = () => setPlayingAudio(null)
-      a.onerror = () => setPlayingAudio(null)
-      a.play().catch(() => setPlayingAudio(null))
+      currentAudio = a
+      setPlayingAudio(src)
+      a.onended = () => { setPlayingAudio(null); currentAudio = null }
+      a.onerror = () => { setPlayingAudio(null); currentAudio = null }
+      a.play().catch(() => { setPlayingAudio(null); currentAudio = null })
     } catch {
       setPlayingAudio(null)
     }
+  }
+
+  const handleSpeak = (text: string) => {
+    stopCurrentAudio()
+    speak(text)
   }
 
   if (item && cat) {
     return (
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="p-4 flex items-center gap-3" style={{ backgroundColor: cat.color + '15' }}>
-          <button onClick={() => setSelectedItem(null)} className="text-2xl">←</button>
+          <button onClick={() => { stopCurrentAudio(); setSelectedItem(null) }} className="text-2xl">←</button>
           <span className="text-2xl">{cat.icon}</span>
           <span className="font-bold text-lg">{cat.title}</span>
         </div>
@@ -74,11 +92,8 @@ export function LearningCenter() {
             {(item.audio || item.englishTitle) && (
               <button
                 onClick={() => {
-                  if (item.audio) {
-                    playAudio(item.audio)
-                  } else if (item.englishTitle) {
-                    speak(item.englishTitle)
-                  }
+                  if (item.audio) playAudio(item.audio)
+                  else if (item.englishTitle) handleSpeak(item.englishTitle)
                 }}
                 className="w-full py-4 px-6 bg-gradient-to-r from-blue-400 to-blue-500 text-white rounded-xl font-bold text-lg hover:shadow-lg transition transform hover:scale-105"
               >
@@ -96,18 +111,16 @@ export function LearningCenter() {
                 >
                   您的浏览器不支持视频播放
                 </video>
-                <p className="text-center text-gray-400 text-xs mt-2">如视频无法播放，请直接下载观看</p>
               </div>
             )}
 
             {item.pdf && (
               <a
                 href={item.pdf}
-                target="_blank"
-                rel="noopener noreferrer"
+                download
                 className="w-full py-4 px-6 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-xl font-bold text-lg text-center hover:shadow-lg transition transform hover:scale-105 block"
               >
-                📄 打开PDF查看
+                📥 下载PDF资料
               </a>
             )}
           </div>
@@ -120,7 +133,7 @@ export function LearningCenter() {
     return (
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="p-4 flex items-center gap-3" style={{ backgroundColor: cat.color + '15' }}>
-          <button onClick={() => setSelectedCat(null)} className="text-2xl">←</button>
+          <button onClick={() => { stopCurrentAudio(); setSelectedCat(null) }} className="text-2xl">←</button>
           <span className="text-2xl">{cat.icon}</span>
           <span className="font-bold text-lg">{cat.title}</span>
           <span className="text-sm text-gray-500 ml-auto">{cat.items.length}项</span>
@@ -150,12 +163,11 @@ export function LearningCenter() {
                 <a
                   key={i.id}
                   href={i.pdf}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  download
                   className="block p-4 rounded-xl border-2 border-gray-200 hover:border-orange-400 transition"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-3xl">📄</span>
+                    <span className="text-3xl">📥</span>
                     <div>
                       <div className="font-semibold">{i.title}</div>
                       {i.description && <div className="text-sm text-gray-500">{i.description}</div>}
@@ -174,7 +186,11 @@ export function LearningCenter() {
                   onClick={() => {
                     if (i.audio) playAudio(i.audio)
                   }}
-                  className="p-4 rounded-xl border-2 border-gray-200 hover:border-purple-400 transition text-center"
+                  className={`p-4 rounded-xl border-2 transition text-center ${
+                    playingAudio === i.audio
+                      ? 'border-purple-400 bg-purple-50'
+                      : 'border-gray-200 hover:border-purple-400'
+                  }`}
                 >
                   <div className="text-3xl mb-1">{i.image}</div>
                   <div className="font-semibold text-sm">{i.title}</div>
