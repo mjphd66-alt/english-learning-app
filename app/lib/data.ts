@@ -463,9 +463,9 @@ export const learningCategories: LearningCategory[] = [
     color: '#F39C12',
     type: 'pdf',
     items: [
-      { id: 'pdf1', title: '北京版二年级英语下册教材', image: '📖', pdf: '/pdf/北京版二年级英语下册·新版教材.pdf', description: '完整课本教材' },
-      { id: 'pdf2', title: '英语科普类思维导图102张', image: '🧠', pdf: '/pdf/科普类思维导图102张.pdf', description: '动物、果蔬、车辆思维导图' },
-      { id: 'pdf3', title: '亲子英语句子卡片380个', image: '👨‍👩‍👧', pdf: '/pdf/亲子英语句子卡片（380个）.pdf', description: '日常亲子英语对话练习' },
+      { id: 'pdf1', title: '北京版二年级英语下册教材', image: '📖', pdf: '/pdf/bj-grade2-english-textbook.pdf', description: '完整课本教材' },
+      { id: 'pdf2', title: '英语科普类思维导图102张', image: '🧠', pdf: '/pdf/science-mind-maps-102.pdf', description: '动物、果蔬、车辆思维导图' },
+      { id: 'pdf3', title: '亲子英语句子卡片380个', image: '👨‍👩‍👧', pdf: '/pdf/parent-child-english-cards-380.pdf', description: '日常亲子英语对话练习' },
     ]
   },
 ]
