@@ -26,7 +26,7 @@ export function UserProfile() {
         <div className="text-4xl">🌟</div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div className="bg-gradient-to-br from-red-100 to-red-200 rounded-lg p-4">
           <div className="text-sm text-gray-600">打卡天数</div>
           <div className="text-3xl font-bold text-red-600">{userData.totalCheckIns}</div>
@@ -45,11 +45,6 @@ export function UserProfile() {
           <div className="text-3xl font-bold text-blue-600">
             {hours > 0 ? `${hours}h${minutes}m` : `${userData.totalLearningMinutes}m`}
           </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-lg p-4">
-          <div className="text-sm text-gray-600">学习分类</div>
-          <div className="text-3xl font-bold text-green-600">{userData.visitedCategories.size}</div>
         </div>
       </div>
 

@@ -6,7 +6,6 @@ export interface LearningResource {
   image?: string
   audio?: string
   video?: string
-  pdf?: string
   description?: string
 }
 
@@ -16,7 +15,7 @@ export interface LearningCategory {
   title: string
   description: string
   color: string
-  type: 'vocab' | 'textbook' | 'video' | 'pdf' | 'phrases'
+  type: 'vocab' | 'textbook' | 'video' | 'phrases'
   items: LearningResource[]
 }
 

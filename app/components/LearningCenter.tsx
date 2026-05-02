@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { learningCategories } from '@/app/lib/data'
-import { addCategoryVisit } from '@/app/lib/storage'
+import { addCategoryVisit, getUserData, saveUserData } from '@/app/lib/storage'
 
 function speak(text: string, lang = 'en-US') {
   if (typeof window === 'undefined' || !window.speechSynthesis) return
@@ -23,10 +23,28 @@ function stopCurrentAudio() {
   }
 }
 
+function addLearningTime(minutes: number) {
+  if (minutes < 0.05) return
+  const data = getUserData()
+  data.totalLearningMinutes += Math.round(minutes)
+  saveUserData(data)
+}
+
 export function LearningCenter() {
   const [selectedCat, setSelectedCat] = useState<string | null>(null)
   const [selectedItem, setSelectedItem] = useState<string | null>(null)
   const [playingAudio, setPlayingAudio] = useState<string | null>(null)
+  const learnStartTime = useRef<number>(0)
+
+  useEffect(() => {
+    return () => {
+      if (learnStartTime.current > 0) {
+        const elapsed = (Date.now() - learnStartTime.current) / 60000
+        addLearningTime(elapsed)
+        learnStartTime.current = 0
+      }
+    }
+  }, [])
 
   const cat = learningCategories.find(c => c.id === selectedCat)
   const item = cat?.items.find(i => i.id === selectedItem)
@@ -35,6 +53,31 @@ export function LearningCenter() {
     setSelectedCat(id)
     setSelectedItem(null)
     addCategoryVisit(id)
+  }
+
+  const openItem = (id: string) => {
+    setSelectedItem(id)
+    learnStartTime.current = Date.now()
+  }
+
+  const closeItem = () => {
+    if (learnStartTime.current > 0) {
+      const elapsed = (Date.now() - learnStartTime.current) / 60000
+      addLearningTime(elapsed)
+      learnStartTime.current = 0
+    }
+    stopCurrentAudio()
+    setSelectedItem(null)
+  }
+
+  const closeCategory = () => {
+    if (learnStartTime.current > 0) {
+      const elapsed = (Date.now() - learnStartTime.current) / 60000
+      addLearningTime(elapsed)
+      learnStartTime.current = 0
+    }
+    stopCurrentAudio()
+    setSelectedCat(null)
   }
 
   const playAudio = (src: string) => {
@@ -61,7 +104,7 @@ export function LearningCenter() {
     return (
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="p-4 flex items-center gap-3" style={{ backgroundColor: cat.color + '15' }}>
-          <button onClick={() => { stopCurrentAudio(); setSelectedItem(null) }} className="text-2xl">←</button>
+          <button onClick={closeItem} className="text-2xl">←</button>
           <span className="text-2xl">{cat.icon}</span>
           <span className="font-bold text-lg">{cat.title}</span>
         </div>
@@ -113,16 +156,6 @@ export function LearningCenter() {
                 </video>
               </div>
             )}
-
-            {item.pdf && (
-              <a
-                href={item.pdf}
-                download
-                className="w-full py-4 px-6 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-xl font-bold text-lg text-center hover:shadow-lg transition transform hover:scale-105 block"
-              >
-                📥 下载PDF资料
-              </a>
-            )}
           </div>
         </div>
       </div>
@@ -133,7 +166,7 @@ export function LearningCenter() {
     return (
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="p-4 flex items-center gap-3" style={{ backgroundColor: cat.color + '15' }}>
-          <button onClick={() => { stopCurrentAudio(); setSelectedCat(null) }} className="text-2xl">←</button>
+          <button onClick={closeCategory} className="text-2xl">←</button>
           <span className="text-2xl">{cat.icon}</span>
           <span className="font-bold text-lg">{cat.title}</span>
           <span className="text-sm text-gray-500 ml-auto">{cat.items.length}项</span>
@@ -147,33 +180,12 @@ export function LearningCenter() {
               {cat.items.map(i => (
                 <button
                   key={i.id}
-                  onClick={() => setSelectedItem(i.id)}
+                  onClick={() => openItem(i.id)}
                   className="w-full p-4 rounded-xl border-2 border-gray-200 hover:border-blue-400 transition text-left flex items-center gap-3"
                 >
                   <span className="text-3xl">🎬</span>
                   <span className="font-semibold">{i.title}</span>
                 </button>
-              ))}
-            </div>
-          )}
-
-          {cat.type === 'pdf' && (
-            <div className="space-y-3">
-              {cat.items.map(i => (
-                <a
-                  key={i.id}
-                  href={i.pdf}
-                  download
-                  className="block p-4 rounded-xl border-2 border-gray-200 hover:border-orange-400 transition"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">📥</span>
-                    <div>
-                      <div className="font-semibold">{i.title}</div>
-                      {i.description && <div className="text-sm text-gray-500">{i.description}</div>}
-                    </div>
-                  </div>
-                </a>
               ))}
             </div>
           )}
@@ -205,7 +217,7 @@ export function LearningCenter() {
               {cat.items.map(i => (
                 <button
                   key={i.id}
-                  onClick={() => setSelectedItem(i.id)}
+                  onClick={() => openItem(i.id)}
                   className="p-3 rounded-xl border-2 border-gray-200 hover:border-blue-400 transition text-center transform hover:scale-105"
                 >
                   {i.image && <div className="text-3xl mb-1">{i.image}</div>}
