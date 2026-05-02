@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { learningCategories } from '@/app/lib/data'
 import { addCategoryVisit } from '@/app/lib/storage'
 
@@ -16,7 +16,7 @@ function speak(text: string, lang = 'en-US') {
 export function LearningCenter() {
   const [selectedCat, setSelectedCat] = useState<string | null>(null)
   const [selectedItem, setSelectedItem] = useState<string | null>(null)
-  const audioRef = useRef<HTMLAudioElement>(null)
+  const [playingAudio, setPlayingAudio] = useState<string | null>(null)
 
   const cat = learningCategories.find(c => c.id === selectedCat)
   const item = cat?.items.find(i => i.id === selectedItem)
@@ -25,6 +25,18 @@ export function LearningCenter() {
     setSelectedCat(id)
     setSelectedItem(null)
     addCategoryVisit(id)
+  }
+
+  const playAudio = (src: string) => {
+    try {
+      setPlayingAudio(src)
+      const a = new Audio(src)
+      a.onended = () => setPlayingAudio(null)
+      a.onerror = () => setPlayingAudio(null)
+      a.play().catch(() => setPlayingAudio(null))
+    } catch {
+      setPlayingAudio(null)
+    }
   }
 
   if (item && cat) {
@@ -59,33 +71,32 @@ export function LearningCenter() {
           )}
 
           <div className="flex flex-col gap-3 items-center">
-            {item.audio && (
-              <div className="w-full">
-                <audio ref={audioRef} src={item.audio} className="hidden" />
-                <button
-                  onClick={() => {
-                    const a = new Audio(item.audio)
-                    a.play()
-                  }}
-                  className="w-full py-4 px-6 bg-gradient-to-r from-green-400 to-green-500 text-white rounded-xl font-bold text-lg hover:shadow-lg transition transform hover:scale-105"
-                >
-                  🔊 听音频朗读
-                </button>
-              </div>
-            )}
-
-            {item.englishTitle && (
+            {(item.audio || item.englishTitle) && (
               <button
-                onClick={() => speak(item.englishTitle!)}
+                onClick={() => {
+                  if (item.audio) {
+                    playAudio(item.audio)
+                  } else if (item.englishTitle) {
+                    speak(item.englishTitle)
+                  }
+                }}
                 className="w-full py-4 px-6 bg-gradient-to-r from-blue-400 to-blue-500 text-white rounded-xl font-bold text-lg hover:shadow-lg transition transform hover:scale-105"
               >
-                🗣️ 跟我读（AI发音）
+                🗣️ 跟我读
               </button>
             )}
 
             {item.video && (
               <div className="w-full">
-                <video controls className="w-full rounded-xl" src={item.video} />
+                <video
+                  controls
+                  className="w-full rounded-xl"
+                  src={item.video}
+                  onError={(e) => console.error('Video error:', e)}
+                >
+                  您的浏览器不支持视频播放
+                </video>
+                <p className="text-center text-gray-400 text-xs mt-2">如视频无法播放，请直接下载观看</p>
               </div>
             )}
 
@@ -161,8 +172,7 @@ export function LearningCenter() {
                 <button
                   key={i.id}
                   onClick={() => {
-                    const a = new Audio(i.audio!)
-                    a.play()
+                    if (i.audio) playAudio(i.audio)
                   }}
                   className="p-4 rounded-xl border-2 border-gray-200 hover:border-purple-400 transition text-center"
                 >
@@ -174,7 +184,7 @@ export function LearningCenter() {
             </div>
           )}
 
-          {(cat.type === 'vocab') && (
+          {cat.type === 'vocab' && (
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
               {cat.items.map(i => (
                 <button
