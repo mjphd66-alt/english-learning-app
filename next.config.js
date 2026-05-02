@@ -3,8 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   output: 'export',
-  trailingSlash: true,
   basePath: '/english-learning-app',
+  trailingSlash: true,
   images: {
     unoptimized: true,
   },
