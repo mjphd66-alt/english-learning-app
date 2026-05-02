@@ -82,7 +82,7 @@ export async function hasAchievement(badgeType: string): Promise<boolean> {
 export async function getStats(): Promise<Stats> {
   const d = await getDB()
   const s = await d.get('stats', 'current')
-  return s || { totalDays: 0, currentStreak: 0, longestStreak: 0, monthlyCount: 0 }
+  return s || { totalDays: 0, currentStreak: 0, longestStreak: 0, monthlyCount: 0, totalVideos: 0, totalAudios: 0 }
 }
 
 export async function saveStats(stats: Stats) {
@@ -120,9 +120,11 @@ export function getLocalDateString(date: Date = new Date()): string {
 
 export function calculateStatsFromCheckins(checkins: Checkin[]): Stats {
   const dates = [...new Set(checkins.map(c => c.date))].sort()
-  if (dates.length === 0) return { totalDays: 0, currentStreak: 0, longestStreak: 0, monthlyCount: 0 }
+  if (dates.length === 0) return { totalDays: 0, currentStreak: 0, longestStreak: 0, monthlyCount: 0, totalVideos: 0, totalAudios: 0 }
 
   const totalDays = dates.length
+  const totalVideos = checkins.filter(c => c.type === 'video' || c.videoBlob).length
+  const totalAudios = checkins.filter(c => c.type === 'audio').length
   let longestStreak = 1
   let tempStreak = 1
 
@@ -157,20 +159,36 @@ export function calculateStatsFromCheckins(checkins: Checkin[]): Stats {
   const thisMonth = today.slice(0, 7)
   const monthlyCount = dates.filter(d => d.startsWith(thisMonth)).length
 
-  return { totalDays, currentStreak, longestStreak, monthlyCount }
+  return { totalDays, currentStreak, longestStreak, monthlyCount, totalVideos, totalAudios }
 }
 
 // Check and unlock achievements
-export async function checkAndUnlockAchievements(stats: Stats): Promise<string[]> {
+export async function checkAndUnlockAchievements(stats: Stats, learningMinutes: number = 0): Promise<string[]> {
   const newBadges: string[] = []
 
-  if (stats.totalDays >= 1 && !(await hasAchievement('first_checkin'))) newBadges.push('first_checkin')
-  if (stats.currentStreak >= 3 && !(await hasAchievement('streak_3'))) newBadges.push('streak_3')
-  if (stats.currentStreak >= 7 && !(await hasAchievement('streak_7'))) newBadges.push('streak_7')
-  if (stats.currentStreak >= 30 && !(await hasAchievement('streak_30'))) newBadges.push('streak_30')
-  if (stats.totalDays >= 10 && !(await hasAchievement('total_10'))) newBadges.push('total_10')
-  if (stats.totalDays >= 50 && !(await hasAchievement('total_50'))) newBadges.push('total_50')
-  if (stats.totalDays >= 100 && !(await hasAchievement('total_100'))) newBadges.push('total_100')
+  const check = async (type: string, condition: boolean) => {
+    if (condition && !(await hasAchievement(type))) newBadges.push(type)
+  }
+
+  await check('first_checkin', stats.totalDays >= 1)
+  await check('streak_3', stats.currentStreak >= 3)
+  await check('streak_7', stats.currentStreak >= 7)
+  await check('streak_14', stats.currentStreak >= 14)
+  await check('streak_30', stats.currentStreak >= 30)
+  await check('streak_100', stats.currentStreak >= 100)
+  await check('total_5', stats.totalDays >= 5)
+  await check('total_10', stats.totalDays >= 10)
+  await check('total_30', stats.totalDays >= 30)
+  await check('total_50', stats.totalDays >= 50)
+  await check('total_100', stats.totalDays >= 100)
+  await check('video_1', stats.totalVideos >= 1)
+  await check('video_10', stats.totalVideos >= 10)
+  await check('video_50', stats.totalVideos >= 50)
+  await check('first_audio', stats.totalAudios >= 1)
+  await check('study_10m', learningMinutes >= 10)
+  await check('study_1h', learningMinutes >= 60)
+  await check('study_5h', learningMinutes >= 300)
+  await check('study_20h', learningMinutes >= 1200)
 
   for (const badgeType of newBadges) {
     await saveAchievement({ id: `ach-${badgeType}-${Date.now()}`, badgeType: badgeType as any, unlockedAt: new Date().toISOString() })

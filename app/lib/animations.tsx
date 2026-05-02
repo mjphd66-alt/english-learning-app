@@ -55,12 +55,24 @@ export function Confetti({ show }: { show: boolean }) {
 export function BadgeUnlockAnimation({ badgeType, show, onClose }: { badgeType: string; show: boolean; onClose: () => void }) {
   const BADGES: Record<string, { name: string; icon: string }> = {
     first_checkin: { name: '初出茅庐', icon: '🎯' },
-    streak_3: { name: '连续3天', icon: '🔥' },
+    first_audio: { name: '声声入耳', icon: '🎙️' },
+    streak_3: { name: '小有成就', icon: '🔥' },
     streak_7: { name: '坚持一周', icon: '💪' },
+    streak_14: { name: '两周达人', icon: '⚡' },
     streak_30: { name: '月度冠军', icon: '🏆' },
-    total_10: { name: '初露锋芒', icon: '⭐' },
+    streak_100: { name: '百日坚持', icon: '💎' },
+    total_5: { name: '初试锋芒', icon: '🌱' },
+    total_10: { name: '崭露头角', icon: '⭐' },
+    total_30: { name: '稳步前行', icon: '📈' },
     total_50: { name: '半百里程', icon: '🌟' },
     total_100: { name: '百日达人', icon: '👑' },
+    video_1: { name: '镜头首秀', icon: '📹' },
+    video_10: { name: '视频达人', icon: '🎬' },
+    video_50: { name: '视频大师', icon: '🎥' },
+    study_10m: { name: '初尝学习', icon: '📖' },
+    study_1h: { name: '学有所成', icon: '📚' },
+    study_5h: { name: '学习使者', icon: '🎓' },
+    study_20h: { name: '学习大师', icon: '🧠' },
   }
   const badge = BADGES[badgeType] || { name: '新成就', icon: '🎊' }
 

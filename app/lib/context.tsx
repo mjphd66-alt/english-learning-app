@@ -25,7 +25,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined)
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [checkins, setCheckins] = useState<Checkin[]>([])
-  const [stats, setStats] = useState<Stats>({ totalDays: 0, currentStreak: 0, longestStreak: 0, monthlyCount: 0 })
+  const [stats, setStats] = useState<Stats>({ totalDays: 0, currentStreak: 0, longestStreak: 0, monthlyCount: 0, totalVideos: 0, totalAudios: 0 })
   const [settings, setSettings] = useState<UserSettings>({ nickname: '小朋友' })
   const [achievements, setAchievements] = useState<Achievement[]>([])
   const [learningMinutes, setLearningMinutes] = useState(0)
@@ -84,7 +84,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const newStats = calculateStatsFromCheckins(checkins)
       await saveStats(newStats)
       setStats(newStats)
-      const badges = await checkAndUnlockAchievements(newStats)
+      const badges = await checkAndUnlockAchievements(newStats, learningMinutes)
       if (badges.length > 0) {
         setNewBadges(badges)
         setAchievements(await getAllAchievements())

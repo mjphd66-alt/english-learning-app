@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useApp } from '@/app/lib/context'
 import { getLocalDateString, deleteCheckin as deleteCheckinDB } from '@/app/lib/db'
 import { AnimatedButton } from '@/app/lib/animations'
-import { BADGE_CONFIG } from '@/app/lib/types'
+import { BADGE_CONFIG, Checkin } from '@/app/lib/types'
 
 interface CheckInCalendarProps {
   onMakeUpCheckIn?: (date: string) => void
@@ -16,6 +16,7 @@ export function CheckInCalendar({ onMakeUpCheckIn }: CheckInCalendarProps) {
   const [viewMonth, setViewMonth] = useState(new Date().getMonth())
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [previewCheckin, setPreviewCheckin] = useState<Checkin | null>(null)
 
   const today = getLocalDateString()
   const prefix = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`
@@ -82,7 +83,6 @@ export function CheckInCalendar({ onMakeUpCheckIn }: CheckInCalendarProps) {
           const isToday = dateStr === today
           const isPast = dateStr < today
           const isSelected = selectedDate === dateStr
-
           return (
             <button key={day} onClick={() => { if (isCheckedIn || isPast || isToday) setSelectedDate(selectedDate === dateStr ? null : dateStr) }}
               className={`aspect-square rounded-lg flex flex-col items-center justify-center text-sm font-medium transition ${
@@ -107,20 +107,26 @@ export function CheckInCalendar({ onMakeUpCheckIn }: CheckInCalendarProps) {
 
           {selectedCheckIns.length > 0 && (
             <div className="space-y-2 mb-3">
-              {selectedCheckIns.map((c, i) => (
-                <div key={c.id} className="flex items-center gap-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-3">
-                  {c.thumbnailBlob ? (
-                    <img src={URL.createObjectURL(c.thumbnailBlob)} alt="" className="w-12 h-12 rounded-lg object-cover" />
-                  ) : (
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-xl">🎬</div>
-                  )}
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-800">视频 {i + 1}</p>
-                    <p className="text-xs text-gray-500">{new Date(c.createdAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</p>
-                  </div>
-                  <AnimatedButton onClick={() => setDeleteConfirm(c.id)} className="text-red-400 text-sm">🗑️</AnimatedButton>
-                </div>
-              ))}
+              {selectedCheckIns.map((c, i) => {
+                const isAudio = c.type === 'audio'
+                return (
+                  <button key={c.id} onClick={() => setPreviewCheckin(c)}
+                    className="w-full flex items-center gap-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-3 text-left hover:shadow-md transition">
+                    {c.thumbnailBlob ? (
+                      <img src={URL.createObjectURL(c.thumbnailBlob)} alt="" className="w-14 h-14 rounded-lg object-cover" />
+                    ) : isAudio ? (
+                      <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-white text-2xl">🎙️</div>
+                    ) : (
+                      <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-2xl">🎬</div>
+                    )}
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-800">{isAudio ? '音频' : '视频'} {i + 1}</p>
+                      <p className="text-xs text-gray-500">{new Date(c.createdAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                    <span className="text-purple-500">▶</span>
+                  </button>
+                )
+              })}
             </div>
           )}
 
@@ -131,11 +137,30 @@ export function CheckInCalendar({ onMakeUpCheckIn }: CheckInCalendarProps) {
         </div>
       )}
 
+      {previewCheckin && (
+        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          <div className="flex items-center justify-between p-4 text-white bg-black/50">
+            <button onClick={() => setPreviewCheckin(null)} className="text-2xl">←</button>
+            <span className="font-bold">{previewCheckin.date} {previewCheckin.type === 'audio' ? '音频' : '视频'}</span>
+            <button onClick={() => { setDeleteConfirm(previewCheckin.id); setPreviewCheckin(null) }} className="text-red-400">🗑️</button>
+          </div>
+          <div className="flex-1 flex items-center justify-center bg-black p-4">
+            {previewCheckin.type === 'audio' && previewCheckin.audioBlob ? (
+              <audio controls autoPlay src={URL.createObjectURL(previewCheckin.audioBlob)} className="w-full max-w-md" />
+            ) : previewCheckin.videoBlob ? (
+              <video controls autoPlay playsInline src={URL.createObjectURL(previewCheckin.videoBlob)} className="max-w-full max-h-full rounded-lg" />
+            ) : (
+              <p className="text-white">无法播放</p>
+            )}
+          </div>
+        </div>
+      )}
+
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setDeleteConfirm(null)}>
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center mx-4" onClick={e => e.stopPropagation()}>
             <span className="text-5xl mb-4 block">🗑️</span>
-            <h3 className="text-lg font-bold text-gray-800 mb-2">确定删除这个视频吗？</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-2">确定删除吗？</h3>
             <p className="text-gray-500 text-sm mb-6">删除后无法恢复</p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteConfirm(null)} className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-full font-medium">取消</button>
