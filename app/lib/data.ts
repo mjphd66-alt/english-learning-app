@@ -1,4 +1,4 @@
-import { LearningCategory, Achievement, UserData } from './types'
+import { LearningCategory } from './types'
 
 export const learningCategories: LearningCategory[] = [
   {
@@ -454,53 +454,6 @@ export const learningCategories: LearningCategory[] = [
       { id: 'vp18', title: 'P18 课文视频', image: '🎬', video: '/video/P18.mp4' },
       { id: 'vp20', title: 'P20 课文视频', image: '🎬', video: '/video/P20.mp4' },
     ]
-  },
-]
-
-export const achievements: Achievement[] = [
-  {
-    id: 'first-checkin', name: '初出茅庐', description: '完成第一次打卡', icon: '🎯', level: 1,
-    condition: (d: UserData) => d.totalCheckIns >= 1
-  },
-  {
-    id: 'streak-3', name: '小有成就', description: '连续打卡3天', icon: '🔥', level: 1,
-    condition: (d: UserData) => d.currentStreak >= 3
-  },
-  {
-    id: 'streak-7', name: '坚持一周', description: '连续打卡7天', icon: '🔥🔥', level: 2,
-    condition: (d: UserData) => d.currentStreak >= 7
-  },
-  {
-    id: 'streak-30', name: '月度冠军', description: '连续打卡30天', icon: '⭐', level: 3,
-    condition: (d: UserData) => d.currentStreak >= 30
-  },
-  {
-    id: 'streak-100', name: '百日坚持', description: '连续打卡100天', icon: '🏆', level: 3,
-    condition: (d: UserData) => d.currentStreak >= 100
-  },
-  {
-    id: 'study-1hour', name: '初尝学习', description: '累计学习1小时', icon: '📚', level: 1,
-    condition: (d: UserData) => d.totalLearningMinutes >= 60
-  },
-  {
-    id: 'study-5hours', name: '学习使者', description: '累计学习5小时', icon: '📚📚', level: 2,
-    condition: (d: UserData) => d.totalLearningMinutes >= 300
-  },
-  {
-    id: 'study-20hours', name: '学习达人', description: '累计学习20小时', icon: '📚📚📚', level: 2,
-    condition: (d: UserData) => d.totalLearningMinutes >= 1200
-  },
-  {
-    id: 'checkin-10', name: '十次打卡', description: '累计打卡10次', icon: '✅', level: 1,
-    condition: (d: UserData) => d.totalCheckIns >= 10
-  },
-  {
-    id: 'checkin-50', name: '五十次打卡', description: '累计打卡50次', icon: '✅✅', level: 2,
-    condition: (d: UserData) => d.totalCheckIns >= 50
-  },
-  {
-    id: 'checkin-100', name: '百次打卡', description: '累计打卡100次', icon: '✅✅✅', level: 3,
-    condition: (d: UserData) => d.totalCheckIns >= 100
   },
 ]
 

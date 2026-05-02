@@ -1,35 +1,27 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { UserData } from './lib/types'
-import { getUserData } from './lib/storage'
+import { useState } from 'react'
+import { AppProvider } from './lib/context'
 import { NavBar } from './components/NavBar'
 import { WelcomeBanner } from './components/WelcomeBanner'
 import { UserProfile } from './components/UserProfile'
 import { LearningCenter } from './components/LearningCenter'
 import { CheckInForm } from './components/CheckInForm'
 import { CheckInCalendar } from './components/CheckInCalendar'
-import { Achievements } from './components/Achievements'
+import { MePage } from './components/MePage'
+import { PageTransition } from './lib/animations'
 
-export default function Home() {
+function AppContent() {
   const [currentTab, setCurrentTab] = useState('home')
-  const [userData, setUserData] = useState<UserData | null>(null)
-  const [refreshKey, setRefreshKey] = useState(0)
   const [makeUpDate, setMakeUpDate] = useState<string | undefined>(undefined)
-
-  useEffect(() => {
-    setUserData(getUserData())
-  }, [refreshKey])
 
   const handleCheckInComplete = () => {
     setMakeUpDate(undefined)
-    setRefreshKey(k => k + 1)
   }
 
   const handleTabChange = (tab: string) => {
     setCurrentTab(tab)
     if (tab !== 'checkin') setMakeUpDate(undefined)
-    setTimeout(() => setRefreshKey(k => k + 1), 100)
   }
 
   const handleMakeUpCheckIn = (date: string) => {
@@ -41,40 +33,28 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 pb-32 pt-4 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-6">
-          <h1 className="text-4xl font-black text-white mb-2 drop-shadow-lg">
-            ✨ 天天英语
-          </h1>
-          <p className="text-white text-sm drop-shadow-md">
-            每天坚持学习，成为英语小达人！
-          </p>
+          <h1 className="text-4xl font-black text-white mb-2 drop-shadow-lg">✨ 天天英语</h1>
+          <p className="text-white text-sm drop-shadow-md">每天坚持学习，成为英语小达人！</p>
         </div>
 
-        <div key={refreshKey}>
+        <PageTransition>
           {currentTab === 'home' && (
             <>
-              <WelcomeBanner userData={userData} />
+              <WelcomeBanner />
               <UserProfile />
-              
               <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">🎯 快速开始</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  <button
-                    onClick={() => handleTabChange('learn')}
-                    className="bg-gradient-to-br from-blue-400 to-blue-500 text-white p-4 rounded-lg font-bold hover:shadow-lg transition transform hover:scale-105"
-                  >
-                    <div className="text-3xl mb-2">📚</div>
-                    <div>开始学习</div>
+                  <button onClick={() => handleTabChange('learn')}
+                    className="bg-gradient-to-br from-blue-400 to-blue-500 text-white p-4 rounded-lg font-bold hover:shadow-lg transition transform hover:scale-105">
+                    <div className="text-3xl mb-2">📚</div><div>开始学习</div>
                   </button>
-                  <button
-                    onClick={() => handleTabChange('checkin')}
-                    className="bg-gradient-to-br from-green-400 to-green-500 text-white p-4 rounded-lg font-bold hover:shadow-lg transition transform hover:scale-105"
-                  >
-                    <div className="text-3xl mb-2">✅</div>
-                    <div>立即打卡</div>
+                  <button onClick={() => handleTabChange('checkin')}
+                    className="bg-gradient-to-br from-green-400 to-green-500 text-white p-4 rounded-lg font-bold hover:shadow-lg transition transform hover:scale-105">
+                    <div className="text-3xl mb-2">✅</div><div>立即打卡</div>
                   </button>
                 </div>
               </div>
-
               <div className="bg-white rounded-lg shadow-lg p-6">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">💡 小提示</h2>
                 <ul className="space-y-2 text-gray-700">
@@ -87,25 +67,22 @@ export default function Home() {
             </>
           )}
 
-          {currentTab === 'learn' && (
-            <LearningCenter />
-          )}
-
-          {currentTab === 'checkin' && (
-            <CheckInForm onCheckInComplete={handleCheckInComplete} targetDate={makeUpDate} />
-          )}
-
-          {currentTab === 'calendar' && (
-            <CheckInCalendar onMakeUpCheckIn={handleMakeUpCheckIn} />
-          )}
-
-          {currentTab === 'achievements' && (
-            <Achievements />
-          )}
-        </div>
+          {currentTab === 'learn' && <LearningCenter />}
+          {currentTab === 'checkin' && <CheckInForm onCheckInComplete={handleCheckInComplete} targetDate={makeUpDate} />}
+          {currentTab === 'calendar' && <CheckInCalendar onMakeUpCheckIn={handleMakeUpCheckIn} />}
+          {currentTab === 'me' && <MePage />}
+        </PageTransition>
       </div>
 
       <NavBar currentTab={currentTab} onTabChange={handleTabChange} />
     </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
   )
 }
