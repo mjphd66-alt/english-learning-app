@@ -15,25 +15,31 @@ export default function Home() {
   const [currentTab, setCurrentTab] = useState('home')
   const [userData, setUserData] = useState<UserData | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [makeUpDate, setMakeUpDate] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     setUserData(getUserData())
   }, [refreshKey])
 
   const handleCheckInComplete = () => {
+    setMakeUpDate(undefined)
     setRefreshKey(k => k + 1)
   }
 
   const handleTabChange = (tab: string) => {
     setCurrentTab(tab)
-    // Refresh data when switching tabs
+    if (tab !== 'checkin') setMakeUpDate(undefined)
     setTimeout(() => setRefreshKey(k => k + 1), 100)
+  }
+
+  const handleMakeUpCheckIn = (date: string) => {
+    setMakeUpDate(date)
+    setCurrentTab('checkin')
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 pb-32 pt-4 px-4">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-4xl font-black text-white mb-2 drop-shadow-lg">
             ✨ 天天英语
@@ -43,7 +49,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Content */}
         <div key={refreshKey}>
           {currentTab === 'home' && (
             <>
@@ -87,11 +92,11 @@ export default function Home() {
           )}
 
           {currentTab === 'checkin' && (
-            <CheckInForm onCheckInComplete={handleCheckInComplete} />
+            <CheckInForm onCheckInComplete={handleCheckInComplete} targetDate={makeUpDate} />
           )}
 
           {currentTab === 'calendar' && (
-            <CheckInCalendar />
+            <CheckInCalendar onMakeUpCheckIn={handleMakeUpCheckIn} />
           )}
 
           {currentTab === 'achievements' && (
@@ -100,7 +105,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Navigation Bar */}
       <NavBar currentTab={currentTab} onTabChange={handleTabChange} />
     </div>
   )

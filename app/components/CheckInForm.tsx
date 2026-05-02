@@ -1,72 +1,55 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { addCheckIn, getUserData } from '@/app/lib/storage'
+import { addCheckIn, getUserData, getLocalDateString } from '@/app/lib/storage'
 import { achievements } from '@/app/lib/data'
 
 interface CheckInProps {
   onCheckInComplete?: () => void
+  targetDate?: string
 }
 
-export function CheckInForm({ onCheckInComplete }: CheckInProps) {
+export function CheckInForm({ onCheckInComplete, targetDate }: CheckInProps) {
   const [submitted, setSubmitted] = useState(false)
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
-  const [isRecording, setIsRecording] = useState(false)
-  const [mode, setMode] = useState<'choose' | 'record' | 'upload'>('choose')
+  const [mode, setMode] = useState<'choose' | 'preview'>('choose')
   const [newAchievements, setNewAchievements] = useState<string[]>([])
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
-  const chunksRef = useRef<Blob[]>([])
+  const [selectedDate, setSelectedDate] = useState(targetDate || getLocalDateString())
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: 640, height: 480 },
-        audio: true
-      })
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        videoRef.current.play()
-      }
-      const recorder = new MediaRecorder(stream)
-      mediaRecorderRef.current = recorder
-      chunksRef.current = []
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data)
-      }
-      recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'video/webm' })
-        const url = URL.createObjectURL(blob)
-        setVideoUrl(url)
-        stream.getTracks().forEach(t => t.stop())
-        if (videoRef.current) videoRef.current.srcObject = null
-      }
-      recorder.start()
-      setIsRecording(true)
-    } catch {
-      alert('无法访问摄像头，请检查权限设置')
-    }
-  }
-
-  const stopRecording = () => {
-    mediaRecorderRef.current?.stop()
-    setIsRecording(false)
-  }
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      const url = URL.createObjectURL(file)
-      setVideoUrl(url)
+    if (!file) return
+    if (!file.type.startsWith('video/')) {
+      alert('请选择视频文件')
+      return
     }
+    const url = URL.createObjectURL(file)
+    setVideoUrl(url)
+    setMode('preview')
+  }
+
+  const openCamera = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'video/*'
+    input.capture = 'environment'
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) {
+        const url = URL.createObjectURL(file)
+        setVideoUrl(url)
+        setMode('preview')
+      }
+    }
+    input.click()
   }
 
   const handleSubmit = () => {
     const oldData = getUserData()
     const oldAch = achievements.filter(a => a.condition(oldData)).map(a => a.id)
 
-    addCheckIn(15, ['video-checkin'])
+    addCheckIn(15, ['video-checkin'], selectedDate)
 
     const newData = getUserData()
     const newAch = achievements
@@ -77,6 +60,13 @@ export function CheckInForm({ onCheckInComplete }: CheckInProps) {
     setSubmitted(true)
     setVideoUrl(null)
     setMode('choose')
+  }
+
+  const reset = () => {
+    setSubmitted(false)
+    setVideoUrl(null)
+    setMode('choose')
+    onCheckInComplete?.()
   }
 
   if (submitted) {
@@ -106,8 +96,8 @@ export function CheckInForm({ onCheckInComplete }: CheckInProps) {
         )}
 
         <button
-          onClick={() => { setSubmitted(false); onCheckInComplete?.() }}
-          className="mt-4 w-full py-3 bg-gradient-to-r from-primary to-pink-500 text-white rounded-xl font-bold"
+          onClick={reset}
+          className="mt-4 w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold"
         >
           继续打卡
         </button>
@@ -115,115 +105,78 @@ export function CheckInForm({ onCheckInComplete }: CheckInProps) {
     )
   }
 
+  const today = getLocalDateString()
+  const isToday = selectedDate === today
+
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">✅ 视频打卡</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">✅ 视频打卡</h2>
+
+      <div className="mb-4">
+        <label className="block text-sm text-gray-600 mb-1">打卡日期</label>
+        <input
+          type="date"
+          value={selectedDate}
+          max={today}
+          onChange={e => setSelectedDate(e.target.value)}
+          className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 outline-none"
+        />
+        {!isToday && (
+          <p className="text-sm text-orange-500 mt-1">📝 补卡模式</p>
+        )}
+      </div>
 
       {mode === 'choose' && (
         <div className="space-y-4">
-          <p className="text-gray-600 text-center mb-4">录制或上传今天的学习视频</p>
+          <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-4 text-center mb-4">
+            <span className="text-3xl block mb-2">📱</span>
+            <p className="text-sm text-gray-600">先用手机相机录制英语视频，然后在这里上传</p>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <button
-              onClick={() => setMode('record')}
-              className="p-6 rounded-xl bg-gradient-to-br from-red-400 to-red-500 text-white font-bold hover:shadow-lg transition transform hover:scale-105"
+              onClick={openCamera}
+              className="p-6 rounded-xl bg-gradient-to-br from-purple-400 to-pink-500 text-white font-bold hover:shadow-lg transition transform hover:scale-105"
             >
               <div className="text-4xl mb-2">📹</div>
-              <div>录制视频</div>
+              <div>拍摄视频</div>
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="p-6 rounded-xl bg-gradient-to-br from-blue-400 to-blue-500 text-white font-bold hover:shadow-lg transition transform hover:scale-105"
+              className="p-6 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-500 text-white font-bold hover:shadow-lg transition transform hover:scale-105"
             >
               <div className="text-4xl mb-2">📁</div>
-              <div>上传视频</div>
+              <div>从相册选择</div>
             </button>
           </div>
           <input
             ref={fileInputRef}
             type="file"
             accept="video/*"
-            onChange={(e) => { handleFileUpload(e); setMode('upload') }}
+            onChange={handleFileSelect}
             className="hidden"
           />
+          <p className="text-center text-gray-400 text-xs">每天可以上传多个视频</p>
         </div>
       )}
 
-      {mode === 'record' && (
-        <div className="space-y-4">
-          <div className="relative bg-black rounded-xl overflow-hidden" style={{ minHeight: 240 }}>
-            <video ref={videoRef} className="w-full" muted={isRecording} />
-            {!videoUrl && !isRecording && (
-              <div className="absolute inset-0 flex items-center justify-center text-white text-lg">
-                点击下方按钮开始录制
-              </div>
-            )}
-            {videoUrl && (
-              <video src={videoUrl} controls className="w-full" />
-            )}
-          </div>
-
-          <div className="flex gap-3">
-            {!isRecording && !videoUrl && (
-              <button
-                onClick={startRecording}
-                className="flex-1 py-4 bg-red-500 text-white rounded-xl font-bold text-lg hover:bg-red-600 transition"
-              >
-                🔴 开始录制
-              </button>
-            )}
-            {isRecording && (
-              <button
-                onClick={stopRecording}
-                className="flex-1 py-4 bg-gray-700 text-white rounded-xl font-bold text-lg animate-pulse"
-              >
-                ⏹️ 停止录制
-              </button>
-            )}
-            {videoUrl && (
-              <>
-                <button
-                  onClick={() => { setVideoUrl(null); setMode('choose') }}
-                  className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-bold"
-                >
-                  重新录制
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  className="flex-1 py-3 bg-gradient-to-r from-green-400 to-green-500 text-white rounded-xl font-bold"
-                >
-                  ✅ 提交打卡
-                </button>
-              </>
-            )}
-            {!isRecording && !videoUrl && (
-              <button
-                onClick={() => setMode('choose')}
-                className="flex-1 py-4 bg-gray-200 text-gray-700 rounded-xl font-bold"
-              >
-                ← 返回
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {mode === 'upload' && videoUrl && (
+      {mode === 'preview' && videoUrl && (
         <div className="space-y-4">
           <div className="bg-black rounded-xl overflow-hidden">
-            <video src={videoUrl} controls className="w-full" />
+            <video src={videoUrl} controls autoPlay playsInline className="w-full" />
           </div>
           <div className="flex gap-3">
             <button
               onClick={() => { setVideoUrl(null); setMode('choose') }}
               className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-bold"
             >
-              重新选择
+              🔄 重新选择
             </button>
             <button
               onClick={handleSubmit}
               className="flex-1 py-3 bg-gradient-to-r from-green-400 to-green-500 text-white rounded-xl font-bold"
             >
-              ✅ 提交打卡
+              ✅ 确认打卡
             </button>
           </div>
         </div>

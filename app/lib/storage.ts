@@ -1,6 +1,13 @@
 import { UserData, CheckIn } from './types'
 import { STORAGE_KEY } from './data'
 
+export function getLocalDateString(date: Date = new Date()): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
 export function getUserData(): UserData {
   if (typeof window === 'undefined') {
     return getDefaultUserData()
@@ -10,7 +17,6 @@ export function getUserData(): UserData {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored) {
       const data = JSON.parse(stored)
-      // Convert visitedCategories from array to Set if needed
       if (Array.isArray(data.visitedCategories)) {
         data.visitedCategories = new Set(data.visitedCategories)
       } else if (typeof data.visitedCategories === 'object' && !data.visitedCategories._isSet) {
@@ -29,7 +35,6 @@ export function saveUserData(data: UserData): void {
   if (typeof window === 'undefined') return
 
   try {
-    // Convert Set to array for JSON serialization
     const serializable = {
       ...data,
       visitedCategories: Array.from(data.visitedCategories || [])
@@ -55,43 +60,30 @@ export function getDefaultUserData(): UserData {
   }
 }
 
-export function addCheckIn(durationMinutes: number, contentIds: string[]): CheckIn {
+export function addCheckIn(durationMinutes: number, contentIds: string[], dateStr?: string): CheckIn {
   const data = getUserData()
-  const today = new Date().toISOString().split('T')[0]
-  
-  // Check if already checked in today
-  const existingCheckIn = data.checkIns.find(c => c.date === today)
-  if (existingCheckIn) {
-    // Update existing check-in
-    existingCheckIn.durationMinutes += durationMinutes
-    existingCheckIn.contentIds = [...new Set([...existingCheckIn.contentIds, ...contentIds])]
-  } else {
-    const newCheckIn: CheckIn = {
-      id: `checkin_${Date.now()}`,
-      date: today,
-      durationMinutes,
-      contentIds,
-      streak: calculateStreak(data.checkIns)
-    }
-    data.checkIns.unshift(newCheckIn)
-    data.totalCheckIns += 1
-  }
+  const date = dateStr || getLocalDateString()
 
-  // Update learning time
+  const newCheckIn: CheckIn = {
+    id: `checkin_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    date,
+    durationMinutes,
+    contentIds,
+    streak: 0
+  }
+  data.checkIns.unshift(newCheckIn)
+
+  const uniqueDates = [...new Set(data.checkIns.map(c => c.date))]
+  data.totalCheckIns = uniqueDates.length
+
   data.totalLearningMinutes += durationMinutes
-  
-  // Update visited categories
-  contentIds.forEach(id => {
-    // Find which category this content belongs to
-    // This would be populated from the content lookup
-  })
 
   data.currentStreak = calculateStreak(data.checkIns)
   data.longestStreak = Math.max(data.longestStreak, data.currentStreak)
 
   saveUserData(data)
-  
-  return data.checkIns.find(c => c.date === today) as CheckIn
+
+  return newCheckIn
 }
 
 export function addCategoryVisit(categoryId: string): void {
@@ -100,21 +92,28 @@ export function addCategoryVisit(categoryId: string): void {
   saveUserData(data)
 }
 
-export function calculateStreak(checkIns: CheckIn[]): number {
-  if (checkIns.length === 0) return 0
+export function addLearningTime(minutes: number): void {
+  if (minutes < 0.05) return
+  const data = getUserData()
+  data.totalLearningMinutes += Math.round(minutes)
+  saveUserData(data)
+}
 
-  let streak = 0
-  const today = new Date()
-  
-  for (let i = 0; i < checkIns.length; i++) {
-    const checkInDate = new Date(checkIns[i].date)
-    const expectedDate = new Date(today)
-    expectedDate.setDate(expectedDate.getDate() - i)
-    
-    const checkInDateStr = checkInDate.toISOString().split('T')[0]
-    const expectedDateStr = expectedDate.toISOString().split('T')[0]
-    
-    if (checkInDateStr === expectedDateStr) {
+export function calculateStreak(checkIns: CheckIn[]): number {
+  const dates = [...new Set(checkIns.map(c => c.date))].sort().reverse()
+  if (dates.length === 0) return 0
+
+  const today = getLocalDateString()
+  const yesterday = getLocalDateString(new Date(Date.now() - 86400000))
+
+  if (dates[0] !== today && dates[0] !== yesterday) return 0
+
+  let streak = 1
+  for (let i = 0; i < dates.length - 1; i++) {
+    const curr = new Date(dates[i] + 'T00:00:00')
+    const prev = new Date(dates[i + 1] + 'T00:00:00')
+    const diff = Math.round((curr.getTime() - prev.getTime()) / 86400000)
+    if (diff === 1) {
       streak++
     } else {
       break
@@ -126,30 +125,27 @@ export function calculateStreak(checkIns: CheckIn[]): number {
 
 export function getTodayCheckIn(): CheckIn | undefined {
   const data = getUserData()
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
   return data.checkIns.find(c => c.date === today)
 }
 
-export function getCheckInsForWeek(): CheckIn[] {
+export function getCheckInsForDate(dateStr: string): CheckIn[] {
   const data = getUserData()
-  const oneWeekAgo = new Date()
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-  
-  return data.checkIns.filter(c => {
-    const checkInDate = new Date(c.date)
-    return checkInDate >= oneWeekAgo
-  })
+  return data.checkIns.filter(c => c.date === dateStr)
 }
 
-export function getCheckInsForMonth(): CheckIn[] {
+export function getCheckInsForMonth(year?: number, month?: number): CheckIn[] {
   const data = getUserData()
-  const oneMonthAgo = new Date()
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
-  
-  return data.checkIns.filter(c => {
-    const checkInDate = new Date(c.date)
-    return checkInDate >= oneMonthAgo
-  })
+  const now = new Date()
+  const y = year ?? now.getFullYear()
+  const m = month ?? now.getMonth()
+  const prefix = `${y}-${String(m + 1).padStart(2, '0')}`
+  return data.checkIns.filter(c => c.date.startsWith(prefix))
+}
+
+export function getCheckInDatesForMonth(year: number, month: number): Set<string> {
+  const checkins = getCheckInsForMonth(year, month)
+  return new Set(checkins.map(c => c.date))
 }
 
 export function getUnlockedAchievements(data: UserData, allAchievements: any[]): string[] {
