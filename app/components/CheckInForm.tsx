@@ -24,7 +24,8 @@ export function CheckInForm({ onCheckInComplete, targetDate }: CheckInProps) {
   const [selectedDate, setSelectedDate] = useState(targetDate || getLocalDateString())
   const [showConfetti, setShowConfetti] = useState(false)
   const [showBadge, setShowBadge] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const videoInputRef = useRef<HTMLInputElement>(null)
+  const audioInputRef = useRef<HTMLInputElement>(null)
 
   const generateThumbnail = (videoFile: Blob): Promise<Blob | null> => {
     return new Promise((resolve) => {
@@ -74,10 +75,10 @@ export function CheckInForm({ onCheckInComplete, targetDate }: CheckInProps) {
     setStep('preview')
   }
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: CheckinType) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (checkinType === 'video') processVideoFile(file)
+    if (type === 'video') processVideoFile(file)
     else processAudioFile(file)
   }
 
@@ -173,7 +174,7 @@ export function CheckInForm({ onCheckInComplete, targetDate }: CheckInProps) {
                 className="p-5 rounded-xl bg-gradient-to-br from-purple-400 to-pink-500 text-white font-bold">
                 <div className="text-3xl mb-2">📹</div><div className="text-sm">拍摄视频</div>
               </AnimatedButton>
-              <AnimatedButton onClick={() => { setCheckinType('video'); fileInputRef.current?.click() }}
+              <AnimatedButton onClick={() => { setCheckinType('video'); videoInputRef.current?.click() }}
                 className="p-5 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-500 text-white font-bold">
                 <div className="text-3xl mb-2">📁</div><div className="text-sm">上传视频</div>
               </AnimatedButton>
@@ -181,12 +182,13 @@ export function CheckInForm({ onCheckInComplete, targetDate }: CheckInProps) {
                 className="p-5 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 text-white font-bold">
                 <div className="text-3xl mb-2">🎙️</div><div className="text-sm">录制音频</div>
               </AnimatedButton>
-              <AnimatedButton onClick={() => { setCheckinType('audio'); fileInputRef.current?.click() }}
+              <AnimatedButton onClick={() => { setCheckinType('audio'); audioInputRef.current?.click() }}
                 className="p-5 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 text-white font-bold">
                 <div className="text-3xl mb-2">🎵</div><div className="text-sm">上传音频</div>
               </AnimatedButton>
             </div>
-            <input ref={fileInputRef} type="file" accept={checkinType === 'video' ? 'video/*' : 'audio/*'} onChange={handleFileSelect} className="hidden" />
+            <input ref={videoInputRef} type="file" accept="video/*" onChange={e => handleFileSelect(e, 'video')} className="hidden" />
+            <input ref={audioInputRef} type="file" accept="audio/*" onChange={e => handleFileSelect(e, 'audio')} className="hidden" />
             <p className="text-center text-gray-400 text-xs">每天可以上传多个视频/音频</p>
           </div>
         )}
